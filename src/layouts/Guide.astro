@@ -1,0 +1,125 @@
+---
+/**
+ * 横断ドキュメント個別ページのレイアウト。
+ * 案件カードより軽い1カラム構成。
+ */
+import Base from "./Base.astro";
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  data: CollectionEntry<"guides">["data"];
+}
+
+const { data } = Astro.props;
+const dateFmt = new Intl.DateTimeFormat("ja-JP", { dateStyle: "long" });
+---
+
+<Base title={data.title} description={data.summary}>
+  <article class="guide">
+    <header class="guide-header">
+      <p class="guide-kicker mono">横断ドキュメント / {String(data.order).padStart(2, "0")}</p>
+      <h1 class="guide-title">{data.title}</h1>
+      <p class="guide-summary">{data.summary}</p>
+      <p class="guide-updated mono">更新: {dateFmt.format(data.updated)}</p>
+    </header>
+    <div class="guide-body">
+      <slot />
+    </div>
+  </article>
+</Base>
+
+<style>
+  .guide {
+    max-width: var(--content-width);
+  }
+  .guide-header {
+    border-bottom: var(--border-boundary);
+    padding-bottom: var(--space-6);
+    margin-bottom: var(--space-8);
+  }
+  .guide-kicker {
+    font-size: var(--text-xs);
+    color: var(--color-ink-muted);
+    letter-spacing: 0.06em;
+    margin: 0 0 var(--space-2);
+  }
+  .guide-title {
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-2xl);
+  }
+  .guide-summary {
+    margin: 0 0 var(--space-3);
+    color: var(--color-ink-muted);
+  }
+  .guide-updated {
+    margin: 0;
+    font-size: var(--text-xs);
+    color: var(--color-ink-muted);
+  }
+  .mono {
+    font-family: var(--font-mono);
+  }
+
+  .guide-body :global(h2) {
+    font-size: var(--text-xl);
+    margin: var(--space-12) 0 var(--space-4);
+    padding-top: var(--space-4);
+    border-top: var(--border-boundary);
+  }
+  .guide-body :global(h3) {
+    font-size: var(--text-lg);
+    margin: var(--space-8) 0 var(--space-3);
+  }
+  .guide-body :global(p) {
+    margin: var(--space-4) 0;
+  }
+  .guide-body :global(ul),
+  .guide-body :global(ol) {
+    padding-left: 1.4em;
+  }
+  .guide-body :global(li) {
+    margin: var(--space-2) 0;
+  }
+  .guide-body :global(ul.contains-task-list) {
+    list-style: none;
+    padding-left: 0;
+    border: var(--border-hairline);
+    background: var(--color-surface);
+  }
+  .guide-body :global(li.task-list-item) {
+    margin: 0;
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
+  }
+  .guide-body :global(li.task-list-item + li.task-list-item) {
+    border-top: 1px dotted var(--color-line);
+  }
+  .guide-body :global(li.task-list-item input[type="checkbox"]) {
+    margin-right: var(--space-2);
+  }
+  .guide-body :global(table) {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: var(--text-sm);
+  }
+  .guide-body :global(th),
+  .guide-body :global(td) {
+    border: var(--border-hairline);
+    padding: var(--space-2) var(--space-3);
+    text-align: left;
+    vertical-align: top;
+  }
+  .guide-body :global(th) {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    background: var(--color-bg);
+  }
+  .guide-body :global(hr) {
+    border: none;
+    border-top: var(--border-boundary);
+    margin: var(--space-12) 0;
+  }
+  .guide-body :global(strong) {
+    font-weight: 700;
+  }
+</style>

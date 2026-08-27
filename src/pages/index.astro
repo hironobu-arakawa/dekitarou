@@ -1,25 +1,148 @@
 ---
 import Base from "../layouts/Base.astro";
+import ResponsibilityBoundary from "../components/ResponsibilityBoundary.astro";
+import CaseCard from "../components/CaseCard.astro";
 import { getCollection } from "astro:content";
+import { bySpecOrder } from "../lib/case-order";
 
-const cases = await getCollection("cases");
+const cases = (await getCollection("cases")).sort(bySpecOrder);
+const guides = (await getCollection("guides")).sort((a, b) => a.data.order - b.data.order);
+
+// トップに置く責任分界図の一般形。「動いた」と「使える」の間に何があるかを1画面で見せる。
+const heroBoundaries = [
+  {
+    layer: "設備本体",
+    owner: "customer",
+    note: "触らない。触った瞬間に責任の質が変わる。",
+  },
+  {
+    layer: "信号・データの取り出し",
+    owner: "licensed",
+    note: "盤の中は有資格者の世界。誰が手配するかを先に決める。",
+  },
+  {
+    layer: "収集・可視化",
+    owner: "contractor",
+    note: "ここだけが受注者の領域。ここは狭いほど強い。",
+  },
+  {
+    layer: "止まった時の一次対応",
+    owner: "shared",
+    note: "決めずに始まった案件は、必ずここで揉める。",
+  },
+  {
+    layer: "判断・処置",
+    owner: "customer",
+    note: "数字を見て動くのは現場。ここは渡さない。",
+  },
+] as const;
 ---
 
 <Base title="動いた、では終わらない">
-  <h1>動いた、では終わらない。</h1>
-  <p>
-    止まった時に誰が直すのかまで決めて、はじめて「できた」。
-  </p>
-  <!-- TODO: 開幕に責任分界図(ResponsibilityBoundary)を置く(specs.md §6)。
-       ここは開発環境セットアップ時の仮ページ。 -->
-  <h2>案件カード</h2>
-  <ul>
-    {
-      cases.map((c) => (
-        <li>
-          <a href={`/cases/${c.data.slug}/`}>{c.data.title}</a> — {c.data.summary}
-        </li>
-      ))
-    }
-  </ul>
+  <section class="hero">
+    <h1 class="hero-copy">
+      動いた、では終わらない。<br />
+      止まった時に誰が直すのかまで決めて、はじめて「できた」。
+    </h1>
+    <p class="hero-sub">
+      現場(OT)の小さなDX案件を受注するエンジニアが、現場に入る前に読むサイト。
+      技術解説ではなく、案件を仕事として閉じるための作法を扱う。
+    </p>
+    <ResponsibilityBoundary boundaries={[...heroBoundaries]} caption="小さな現場DX案件の一般形" />
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">案件カード</h2>
+    <p class="section-lead">
+      案件単位の実務ドキュメント。すべて同じ12セクション・同じ順序で書かれている。上から順に、設備との距離が近くなる。
+    </p>
+    <div class="case-list">
+      {
+        cases.map((c) => (
+          <CaseCard
+            slug={c.data.slug}
+            title={c.data.title}
+            summary={c.data.summary}
+            difficulty={c.data.difficulty}
+            budgetRange={c.data.budgetRange}
+            duration={c.data.duration}
+            requiresLicense={c.data.requiresLicense}
+            touchesEquipment={c.data.touchesEquipment}
+          />
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">横断ドキュメント</h2>
+    <p class="section-lead">案件をまたいで共通する作法。現場に入る前・契約する前に読む。</p>
+    <ul class="guide-links">
+      {
+        guides.map((g) => (
+          <li>
+            <a href={`/guides/${g.data.slug}/`}>{g.data.title}</a>
+            <span class="guide-summary">{g.data.summary}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
 </Base>
+
+<style>
+  .hero {
+    max-width: var(--content-width);
+  }
+  .hero-copy {
+    font-size: var(--text-2xl);
+    line-height: 1.6;
+    margin: var(--space-8) 0 var(--space-4);
+  }
+  .hero-sub {
+    color: var(--color-ink-muted);
+    margin: 0 0 var(--space-4);
+  }
+
+  .section {
+    margin-top: var(--space-16);
+    max-width: var(--content-width);
+  }
+  .section-title {
+    font-size: var(--text-xl);
+    border-top: var(--border-boundary);
+    padding-top: var(--space-4);
+    margin: 0 0 var(--space-2);
+  }
+  .section-lead {
+    color: var(--color-ink-muted);
+    font-size: var(--text-sm);
+    margin: 0 0 var(--space-6);
+  }
+  .case-list {
+    display: grid;
+    gap: var(--space-4);
+  }
+  .guide-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-3);
+  }
+  .guide-links li {
+    display: grid;
+    gap: var(--space-1);
+  }
+  .guide-links a {
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+  .guide-links a:hover {
+    color: var(--color-owner-contractor);
+  }
+  .guide-summary {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+  }
+</style>

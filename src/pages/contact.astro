@@ -1,0 +1,51 @@
+---
+import Base from "../layouts/Base.astro";
+
+// 外部フォームサービス(Tally / Formspree)の埋め込みURL。
+// アカウント作成後にここを差し替えるだけで有効になる。空の間は案内文を表示する。
+const FORM_EMBED_URL = "";
+---
+
+<Base title="問い合わせ" description="デキタロウへの問い合わせ。">
+  <article class="contact">
+    <h1>問い合わせ</h1>
+    <p>
+      内容の誤りの指摘、扱ってほしい案件の型、その他の連絡はこちらから。
+      個別案件の可否判断・見積の妥当性の保証はできないことを踏まえたうえで送ってほしい。
+    </p>
+
+    {
+      FORM_EMBED_URL ? (
+        <iframe
+          src={FORM_EMBED_URL}
+          title="問い合わせフォーム"
+          class="contact-form"
+          loading="lazy"
+        />
+      ) : (
+        <div class="contact-placeholder">
+          <p>問い合わせフォームは準備中。</p>
+        </div>
+      )
+    }
+  </article>
+</Base>
+
+<style>
+  .contact {
+    max-width: var(--content-width);
+  }
+  .contact-form {
+    width: 100%;
+    min-height: 32rem;
+    border: var(--border-hairline);
+    background: var(--color-surface);
+  }
+  .contact-placeholder {
+    border: var(--border-hairline);
+    border-left: 3px solid var(--color-line-strong);
+    background: var(--color-surface);
+    padding: var(--space-4) var(--space-6);
+    color: var(--color-ink-muted);
+  }
+</style>

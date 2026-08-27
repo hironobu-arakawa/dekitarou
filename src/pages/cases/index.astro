@@ -2,11 +2,10 @@
 import Base from "../../layouts/Base.astro";
 import CaseCard from "../../components/CaseCard.astro";
 import { getCollection } from "astro:content";
+import { bySpecOrder } from "../../lib/case-order";
 
-// 難易度昇順 = 責任分界が単純な順に並べる(安全な入口から読ませる)
-const cases = (await getCollection("cases")).sort(
-  (a, b) => a.data.difficulty - b.data.difficulty || a.data.slug.localeCompare(b.data.slug),
-);
+// 掲載順は仕様の並び = 責任分界の説明力が高い順(安全な入口から読ませる)
+const cases = (await getCollection("cases")).sort(bySpecOrder);
 ---
 
 <Base
@@ -15,7 +14,7 @@ const cases = (await getCollection("cases")).sort(
 >
   <h1>案件カード</h1>
   <p class="lead">
-    案件単位の実務ドキュメント。すべてのカードが同じ11セクション・同じ順序で書かれている。比較して読むこと。
+    案件単位の実務ドキュメント。すべてのカードが同じ12セクション・同じ順序で書かれている。比較して読むこと。
   </p>
   <div class="case-list">
     {

@@ -1,0 +1,78 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getCollection } from "astro:content";
+
+const guides = (await getCollection("guides")).sort((a, b) => a.data.order - b.data.order);
+---
+
+<Base
+  title="横断ドキュメント"
+  description="案件をまたいで共通する、OT現場の受注作法。現場に入る前・契約する前に読む3本。"
+>
+  <h1>横断ドキュメント</h1>
+  <p class="lead">案件をまたいで共通する作法。現場に入る前・契約する前に読む。</p>
+  <ol class="guide-list">
+    {
+      guides.map((g) => (
+        <li>
+          <a href={`/guides/${g.data.slug}/`} class="guide-item">
+            <span class="guide-order mono">{String(g.data.order).padStart(2, "0")}</span>
+            <span class="guide-text">
+              <span class="guide-item-title">{g.data.title}</span>
+              <span class="guide-item-summary">{g.data.summary}</span>
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+</Base>
+
+<style>
+  .lead {
+    color: var(--color-ink-muted);
+    max-width: var(--content-width);
+  }
+  .guide-list {
+    list-style: none;
+    margin: var(--space-8) 0 0;
+    padding: 0;
+    max-width: var(--content-width);
+    display: grid;
+    gap: var(--space-4);
+  }
+  .guide-item {
+    display: flex;
+    gap: var(--space-4);
+    align-items: baseline;
+    border: var(--border-hairline);
+    border-left: 3px solid var(--color-line-strong);
+    background: var(--color-surface);
+    padding: var(--space-4) var(--space-6);
+    text-decoration: none;
+    color: var(--color-ink);
+  }
+  .guide-item:hover .guide-item-title {
+    color: var(--color-owner-contractor);
+    text-decoration: underline;
+  }
+  .guide-order {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+  }
+  .guide-text {
+    display: grid;
+    gap: var(--space-1);
+  }
+  .guide-item-title {
+    font-weight: 700;
+    font-size: var(--text-lg);
+  }
+  .guide-item-summary {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+  }
+  .mono {
+    font-family: var(--font-mono);
+  }
+</style>
