@@ -1,0 +1,71 @@
+/*
+ * デキタロウ デザイントークン (specs.md §8)
+ * 狙い: 計装ドキュメント/設計図面の質感。基調は無彩色寄り。
+ * 罫線は装飾ではなく責任の境界を示す時だけ使う。
+ */
+
+:root {
+  /* ---- 配色: 基調(無彩色寄り・図面) ---- */
+  --color-bg: #fafaf8;          /* 図面用紙。クリーム地にはしない */
+  --color-surface: #ffffff;
+  --color-ink: #1c1f22;          /* 本文。製図インク */
+  --color-ink-muted: #5a6068;
+  --color-line: #c9cdd2;         /* 補助罫線 */
+  --color-line-strong: #1c1f22;  /* 責任の境界を示す罫線 */
+
+  /* ---- 配色: 責任者4区分(specs.md §5) ---- */
+  /* contractor(受注者): 図面の青。自分の担当領域 */
+  --color-owner-contractor: #1e5a96;
+  --color-owner-contractor-bg: #e3edf6;
+  /* customer(顧客): 中立のグレーグリーン。手を出さない領域 */
+  --color-owner-customer: #4a5d54;
+  --color-owner-customer-bg: #e8ede9;
+  /* licensed(有資格者): 紫。法令が関わる領域 */
+  --color-owner-licensed: #5b4a86;
+  --color-owner-licensed-bg: #eae6f2;
+  /* shared(協議=未決): 唯一の警告色。最大のリスクを色で示す */
+  --color-owner-shared: #a8451c;
+  --color-owner-shared-bg: #fbe9dd;
+
+  /* ---- 状態色 ---- */
+  --color-focus: #1e5a96;
+  --color-warning: #a8451c;
+
+  /* ---- タイポグラフィ ---- */
+  /* 日本語Webフォントは可変フォント1つに絞る(実装時に @font-face で確定) */
+  --font-heading: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic",
+    system-ui, sans-serif;
+  --font-body: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic",
+    system-ui, sans-serif;
+  /* 数値・チェックリスト・型番用の等幅 */
+  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, "Noto Sans JP",
+    monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --leading-body: 1.9;   /* 日本語長文向け */
+  --leading-tight: 1.4;
+
+  /* ---- 余白・寸法 ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  --content-width: 44rem;     /* 本文の最大幅 */
+  --page-width: 72rem;        /* 目次+本文の最大幅 */
+
+  /* ---- 罫線 ---- */
+  --border-hairline: 1px solid var(--color-line);
+  --border-boundary: 2px solid var(--color-line-strong);
+
+  --radius: 2px;  /* 図面の質感。角丸カードにはしない */
+}

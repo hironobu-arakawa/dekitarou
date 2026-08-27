@@ -1,0 +1,25 @@
+---
+import Base from "../layouts/Base.astro";
+import { getCollection } from "astro:content";
+
+const cases = await getCollection("cases");
+---
+
+<Base title="動いた、では終わらない">
+  <h1>動いた、では終わらない。</h1>
+  <p>
+    止まった時に誰が直すのかまで決めて、はじめて「できた」。
+  </p>
+  <!-- TODO: 開幕に責任分界図(ResponsibilityBoundary)を置く(specs.md §6)。
+       ここは開発環境セットアップ時の仮ページ。 -->
+  <h2>案件カード</h2>
+  <ul>
+    {
+      cases.map((c) => (
+        <li>
+          <a href={`/cases/${c.data.slug}/`}>{c.data.title}</a> — {c.data.summary}
+        </li>
+      ))
+    }
+  </ul>
+</Base>

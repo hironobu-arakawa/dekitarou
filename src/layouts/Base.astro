@@ -1,0 +1,99 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "現場で小さなDX案件を受注するエンジニアが、現場に入る前に読むサイト。" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title} | デキタロウ</title>
+  </head>
+  <body>
+    <header class="site-header">
+      <nav aria-label="サイト内">
+        <a href="/" class="site-name">デキタロウ</a>
+        <ul class="site-nav">
+          <li><a href="/cases/">案件カード</a></li>
+          <li><a href="/guides/">横断ドキュメント</a></li>
+          <li><a href="/about/">このサイトについて</a></li>
+          <li><a href="/contact/">問い合わせ</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <!-- 全ページ共通のフッター免責(specs.md §10)。文言を変えないこと -->
+      <p class="disclaimer">
+        本サイトの内容は一般的な情報提供であり、個別案件の技術的妥当性・法令適合性を保証するものではありません。<br />
+        電気工事、設備改造、安全装置に関わる作業は、必ず有資格者および設備所有者の判断のもとで実施してください。<br />
+        本サイトで紹介する仕組みは、いずれも安全装置・保護装置の代替とはなりません。
+      </p>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .site-header {
+    border-bottom: var(--border-boundary);
+    padding: var(--space-4) var(--space-6);
+  }
+  .site-header nav {
+    max-width: var(--page-width);
+    margin: 0 auto;
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-8);
+    flex-wrap: wrap;
+  }
+  .site-name {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--color-ink);
+    text-decoration: none;
+    font-size: var(--text-lg);
+  }
+  .site-nav {
+    display: flex;
+    gap: var(--space-6);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: var(--text-sm);
+  }
+  .site-nav a {
+    color: var(--color-ink-muted);
+    text-decoration: none;
+  }
+  .site-nav a:hover {
+    color: var(--color-ink);
+    text-decoration: underline;
+  }
+  main {
+    max-width: var(--page-width);
+    margin: 0 auto;
+    padding: var(--space-8) var(--space-6) var(--space-16);
+  }
+  .site-footer {
+    border-top: var(--border-hairline);
+    padding: var(--space-8) var(--space-6);
+  }
+  .disclaimer {
+    max-width: var(--page-width);
+    margin: 0 auto;
+    font-size: var(--text-xs);
+    color: var(--color-ink-muted);
+  }
+</style>
