@@ -1,0 +1,99 @@
+---
+/**
+ * 現場の5つの管理点(安全・品質・生産・原価・環境)の擦り合わせ表。
+ * 先方はこの軸で現場を管理している。受注者側に知識がないとリスクになる。
+ * 責任分界図と対になる要素。frontmatterのconcernsから描画する。
+ */
+interface Concerns {
+  safety: string;
+  quality: string;
+  production: string;
+  cost: string;
+  environment: string;
+}
+
+interface Props {
+  concerns: Concerns;
+}
+
+const { concerns } = Astro.props;
+
+const axes: { key: keyof Concerns; label: string; reading: string }[] = [
+  { key: "safety", label: "安全", reading: "S" },
+  { key: "quality", label: "品質", reading: "Q" },
+  { key: "production", label: "生産", reading: "D" },
+  { key: "cost", label: "原価", reading: "C" },
+  { key: "environment", label: "環境", reading: "E" },
+];
+---
+
+<div class="sc">
+  <div class="sc-rows">
+    {
+      axes.map((axis) => (
+        <div class="sc-row">
+          <div class="sc-axis">
+            <span class="sc-axis-code mono" aria-hidden="true">{axis.reading}</span>
+            <span class="sc-axis-label">{axis.label}</span>
+          </div>
+          <div class="sc-note">{concerns[axis.key]}</div>
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .sc {
+    margin: var(--space-6) 0;
+  }
+  .sc-rows {
+    border: var(--border-hairline);
+    border-left: 3px solid var(--color-line-strong);
+    background: var(--color-surface);
+  }
+  .sc-row {
+    display: grid;
+    grid-template-columns: 7rem 1fr;
+  }
+  .sc-row + .sc-row {
+    border-top: var(--border-hairline);
+  }
+  .sc-axis {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    border-right: var(--border-hairline);
+    font-weight: 700;
+    line-height: var(--leading-tight);
+  }
+  .sc-axis-code {
+    font-size: var(--text-xs);
+    color: var(--color-ink-muted);
+    border: 1px solid var(--color-line);
+    width: 1.6em;
+    text-align: center;
+  }
+  .sc-note {
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-sm);
+    line-height: 1.7;
+  }
+  .mono {
+    font-family: var(--font-mono);
+  }
+
+  @media (max-width: 40rem) {
+    .sc-row {
+      grid-template-columns: 1fr;
+    }
+    .sc-axis {
+      border-right: none;
+      padding-bottom: 0;
+    }
+    .sc-note {
+      padding-top: var(--space-1);
+    }
+  }
+</style>

@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import CaseLayout from "../../layouts/Case.astro";
 import ResponsibilityBoundary from "../../components/ResponsibilityBoundary.astro";
+import SiteConcerns from "../../components/SiteConcerns.astro";
 
 export async function getStaticPaths() {
   const cases = await getCollection("cases");
@@ -20,17 +21,24 @@ const { entry } = Astro.props;
 
 const html = entry.rendered?.html ?? "";
 
-// Markdown中の「## 責任分界図」見出しの直後に、frontmatterのboundariesから
-// 描画する図を差し込む。見出しが無い場合はビルドを落とす(11セクションは固定)。
-const marker = html.match(/<h2[^>]*>責任分界図<\/h2>/);
-if (!marker || marker.index === undefined) {
-  throw new Error(
-    `案件カード "${entry.data.slug}" に「## 責任分界図」見出しがありません。11セクションは固定です。`,
-  );
+// 固定見出しのセクション冒頭(見出しと、直後に導入段落があればその後)に、
+// frontmatterから描画する図・表を差し込む。
+// 見出しが無い場合はビルドを落とす(12セクションは固定)。
+function splitAfterHeading(source: string, heading: string): [string, string] {
+  const marker = source.match(new RegExp(`<h2[^>]*>${heading}</h2>`));
+  if (!marker || marker.index === undefined) {
+    throw new Error(
+      `案件カード "${entry.data.slug}" に「## ${heading}」見出しがありません。12セクションは固定です。`,
+    );
+  }
+  let cut = marker.index + marker[0].length;
+  const lead = source.slice(cut).match(/^\s*<p>[\s\S]*?<\/p>/);
+  if (lead) cut += lead[0].length;
+  return [source.slice(0, cut), source.slice(cut)];
 }
-const cut = marker.index + marker[0].length;
-const htmlBefore = html.slice(0, cut);
-const htmlAfter = html.slice(cut);
+
+const [htmlBeforeBoundary, htmlRest] = splitAfterHeading(html, "責任分界図");
+const [htmlBeforeConcerns, htmlAfter] = splitAfterHeading(htmlRest, "現場の管理点との擦り合わせ");
 
 const headings = (entry.rendered?.metadata?.headings ?? []) as {
   depth: number;
@@ -40,7 +48,9 @@ const headings = (entry.rendered?.metadata?.headings ?? []) as {
 ---
 
 <CaseLayout data={entry.data} headings={headings}>
-  <Fragment set:html={htmlBefore} />
+  <Fragment set:html={htmlBeforeBoundary} />
   <ResponsibilityBoundary boundaries={entry.data.boundaries} />
+  <Fragment set:html={htmlBeforeConcerns} />
+  <SiteConcerns concerns={entry.data.concerns} />
   <Fragment set:html={htmlAfter} />
 </CaseLayout>

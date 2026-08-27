@@ -14,6 +14,19 @@ const boundarySchema = z.object({
 });
 
 /**
+ * 現場の5つの管理点(安全・品質・生産・原価・環境)。
+ * 先方はこの軸で現場を管理している。知らずに入るとリスクになるため、
+ * 全案件で擦り合わせる内容を明記する。「特になし」で流さず、必ず書く。
+ */
+const concernsSchema = z.object({
+  safety: z.string().min(1),
+  quality: z.string().min(1),
+  production: z.string().min(1),
+  cost: z.string().min(1),
+  environment: z.string().min(1),
+});
+
+/**
  * 案件カード(specs.md §4, §7)。10件の実務ドキュメント。
  */
 const cases = defineCollection({
@@ -30,6 +43,7 @@ const cases = defineCollection({
     touchesEquipment: z.boolean(),
     categories: z.array(z.string()),
     boundaries: z.array(boundarySchema).min(1),
+    concerns: concernsSchema,
     updated: z.coerce.date(),
   }),
 });
