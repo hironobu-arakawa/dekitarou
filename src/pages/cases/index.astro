@@ -1,0 +1,49 @@
+---
+import Base from "../../layouts/Base.astro";
+import CaseCard from "../../components/CaseCard.astro";
+import { getCollection } from "astro:content";
+
+// 難易度昇順 = 責任分界が単純な順に並べる(安全な入口から読ませる)
+const cases = (await getCollection("cases")).sort(
+  (a, b) => a.data.difficulty - b.data.difficulty || a.data.slug.localeCompare(b.data.slug),
+);
+---
+
+<Base
+  title="案件カード一覧"
+  description="OT現場の小さなDX案件を、責任分界・現地調査・見積・撤退基準までまとめた実務ドキュメント。"
+>
+  <h1>案件カード</h1>
+  <p class="lead">
+    案件単位の実務ドキュメント。すべてのカードが同じ11セクション・同じ順序で書かれている。比較して読むこと。
+  </p>
+  <div class="case-list">
+    {
+      cases.map((c) => (
+        <CaseCard
+          slug={c.data.slug}
+          title={c.data.title}
+          summary={c.data.summary}
+          difficulty={c.data.difficulty}
+          budgetRange={c.data.budgetRange}
+          duration={c.data.duration}
+          requiresLicense={c.data.requiresLicense}
+          touchesEquipment={c.data.touchesEquipment}
+        />
+      ))
+    }
+  </div>
+</Base>
+
+<style>
+  .lead {
+    color: var(--color-ink-muted);
+    max-width: var(--content-width);
+  }
+  .case-list {
+    display: grid;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
+    max-width: var(--content-width);
+  }
+</style>

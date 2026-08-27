@@ -1,0 +1,100 @@
+---
+/**
+ * 案件カード一覧用の1件表示。
+ * 図面の部品表の質感。角丸・ドロップシャドウは使わない(specs.md §8)。
+ */
+interface Props {
+  slug: string;
+  title: string;
+  summary: string;
+  difficulty: number;
+  budgetRange: string;
+  duration: string;
+  requiresLicense: boolean;
+  touchesEquipment: boolean;
+}
+
+const { slug, title, summary, difficulty, budgetRange, duration, requiresLicense, touchesEquipment } =
+  Astro.props;
+
+const difficultyBar = "■".repeat(difficulty) + "□".repeat(5 - difficulty);
+---
+
+<article class="case-card">
+  <h3 class="case-card-title">
+    <a href={`/cases/${slug}/`}>{title}</a>
+  </h3>
+  <p class="case-card-summary">{summary}</p>
+  <dl class="case-card-meta">
+    <div>
+      <dt>難易度</dt>
+      <dd><span class="mono" aria-label={`5段階中${difficulty}`}>{difficultyBar}</span></dd>
+    </div>
+    <div>
+      <dt>予算帯</dt>
+      <dd class="mono">{budgetRange}</dd>
+    </div>
+    <div>
+      <dt>期間</dt>
+      <dd class="mono">{duration}</dd>
+    </div>
+    <div>
+      <dt>資格</dt>
+      <dd>{requiresLicense ? "関わる可能性あり" : "原則不要"}</dd>
+    </div>
+    <div>
+      <dt>設備接触</dt>
+      <dd>{touchesEquipment ? "あり" : "なし"}</dd>
+    </div>
+  </dl>
+</article>
+
+<style>
+  .case-card {
+    border: var(--border-hairline);
+    border-left: 3px solid var(--color-line-strong);
+    background: var(--color-surface);
+    padding: var(--space-4) var(--space-6);
+  }
+  .case-card-title {
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-lg);
+  }
+  .case-card-title a {
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+  .case-card-title a:hover {
+    color: var(--color-owner-contractor);
+    text-decoration: underline;
+  }
+  .case-card-summary {
+    margin: 0 0 var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+  }
+  .case-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-6);
+    margin: 0;
+    font-size: var(--text-xs);
+  }
+  .case-card-meta div {
+    display: flex;
+    gap: var(--space-2);
+    align-items: baseline;
+  }
+  .case-card-meta dt {
+    color: var(--color-ink-muted);
+  }
+  .case-card-meta dt::after {
+    content: ":";
+  }
+  .case-card-meta dd {
+    margin: 0;
+  }
+  .mono {
+    font-family: var(--font-mono);
+  }
+</style>

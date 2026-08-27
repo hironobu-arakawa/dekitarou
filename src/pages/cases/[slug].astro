@@ -1,0 +1,46 @@
+---
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import CaseLayout from "../../layouts/Case.astro";
+import ResponsibilityBoundary from "../../components/ResponsibilityBoundary.astro";
+
+export async function getStaticPaths() {
+  const cases = await getCollection("cases");
+  return cases.map((entry) => ({
+    params: { slug: entry.data.slug },
+    props: { entry },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<"cases">;
+}
+
+const { entry } = Astro.props;
+
+const html = entry.rendered?.html ?? "";
+
+// Markdown中の「## 責任分界図」見出しの直後に、frontmatterのboundariesから
+// 描画する図を差し込む。見出しが無い場合はビルドを落とす(11セクションは固定)。
+const marker = html.match(/<h2[^>]*>責任分界図<\/h2>/);
+if (!marker || marker.index === undefined) {
+  throw new Error(
+    `案件カード "${entry.data.slug}" に「## 責任分界図」見出しがありません。11セクションは固定です。`,
+  );
+}
+const cut = marker.index + marker[0].length;
+const htmlBefore = html.slice(0, cut);
+const htmlAfter = html.slice(cut);
+
+const headings = (entry.rendered?.metadata?.headings ?? []) as {
+  depth: number;
+  slug: string;
+  text: string;
+}[];
+---
+
+<CaseLayout data={entry.data} headings={headings}>
+  <Fragment set:html={htmlBefore} />
+  <ResponsibilityBoundary boundaries={entry.data.boundaries} />
+  <Fragment set:html={htmlAfter} />
+</CaseLayout>

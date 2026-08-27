@@ -1,0 +1,331 @@
+---
+/**
+ * 案件カード個別ページのレイアウト。
+ * 11セクション固定順の長文。追従する目次を左に置き、現在位置を示す(specs.md §8)。
+ * モバイルでは目次を折りたたむ。
+ */
+import Base from "./Base.astro";
+import type { CollectionEntry } from "astro:content";
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  data: CollectionEntry<"cases">["data"];
+  headings: Heading[];
+}
+
+const { data, headings } = Astro.props;
+const tocHeadings = headings.filter((h) => h.depth === 2);
+
+const dateFmt = new Intl.DateTimeFormat("ja-JP", { dateStyle: "long" });
+---
+
+<Base title={data.title} description={data.summary}>
+  <article class="case">
+    <header class="case-header">
+      <p class="case-kicker mono">案件カード / {data.slug}</p>
+      <h1 class="case-title">{data.title}</h1>
+      <p class="case-summary">{data.summary}</p>
+      <dl class="case-meta">
+        <div>
+          <dt>難易度</dt>
+          <dd>
+            <span class="mono" aria-label={`5段階中${data.difficulty}`}>
+              {"■".repeat(data.difficulty) + "□".repeat(5 - data.difficulty)}
+            </span>
+          </dd>
+        </div>
+        <div>
+          <dt>予算帯</dt>
+          <dd class="mono">{data.budgetRange}</dd>
+        </div>
+        <div>
+          <dt>期間</dt>
+          <dd class="mono">{data.duration}</dd>
+        </div>
+        <div>
+          <dt>設備接触</dt>
+          <dd>{data.touchesEquipment ? "あり" : "なし"}</dd>
+        </div>
+        <div>
+          <dt>資格・法令</dt>
+          <dd>{data.requiresLicense ? "関わる可能性あり" : "原則不要"}</dd>
+        </div>
+        <div>
+          <dt>更新</dt>
+          <dd class="mono">{dateFmt.format(data.updated)}</dd>
+        </div>
+      </dl>
+      {data.licenseNotes && <p class="case-license-notes">{data.licenseNotes}</p>}
+    </header>
+
+    <div class="case-columns">
+      <details class="toc" open>
+        <summary class="toc-summary">目次</summary>
+        <nav class="toc-nav" aria-label="このページの目次">
+          <ol>
+            {
+              tocHeadings.map((h, i) => (
+                <li>
+                  <a href={`#${h.slug}`}>
+                    <span class="toc-num mono">{String(i + 1).padStart(2, "0")}</span>
+                    {h.text}
+                  </a>
+                </li>
+              ))
+            }
+          </ol>
+        </nav>
+      </details>
+
+      <div class="case-body">
+        <slot />
+      </div>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .case-header {
+    border-bottom: var(--border-boundary);
+    padding-bottom: var(--space-6);
+    margin-bottom: var(--space-8);
+  }
+  .case-kicker {
+    font-size: var(--text-xs);
+    color: var(--color-ink-muted);
+    letter-spacing: 0.06em;
+    margin: 0 0 var(--space-2);
+  }
+  .case-title {
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-2xl);
+  }
+  .case-summary {
+    margin: 0 0 var(--space-4);
+    color: var(--color-ink-muted);
+  }
+  .case-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-8);
+    margin: 0;
+    font-size: var(--text-sm);
+  }
+  .case-meta div {
+    display: flex;
+    gap: var(--space-2);
+    align-items: baseline;
+  }
+  .case-meta dt {
+    color: var(--color-ink-muted);
+  }
+  .case-meta dt::after {
+    content: ":";
+  }
+  .case-meta dd {
+    margin: 0;
+  }
+  .case-license-notes {
+    margin: var(--space-3) 0 0;
+    font-size: var(--text-xs);
+    color: var(--color-ink-muted);
+  }
+  .mono {
+    font-family: var(--font-mono);
+  }
+
+  /* ---- 2カラム: 目次(左・追従) + 本文 ---- */
+  .case-columns {
+    display: grid;
+    grid-template-columns: 15rem minmax(0, var(--content-width));
+    gap: var(--space-12);
+    align-items: start;
+  }
+
+  .toc {
+    position: sticky;
+    top: var(--space-6);
+  }
+  .toc-summary {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    list-style: none;
+    padding: var(--space-2) 0;
+  }
+  .toc-summary::-webkit-details-marker {
+    display: none;
+  }
+  .toc-nav ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-left: var(--border-hairline);
+  }
+  .toc-nav a {
+    display: flex;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    margin-left: -1px;
+    line-height: var(--leading-tight);
+  }
+  .toc-nav a:hover {
+    color: var(--color-ink);
+  }
+  .toc-num {
+    font-size: var(--text-xs);
+    padding-top: 0.15em;
+  }
+  /* 現在位置 */
+  .toc-nav a[aria-current="true"] {
+    color: var(--color-owner-contractor);
+    border-left-color: var(--color-owner-contractor);
+    font-weight: 600;
+  }
+
+  /* ---- 本文(Markdown由来のHTML)---- */
+  .case-body :global(h2) {
+    font-size: var(--text-xl);
+    margin: var(--space-12) 0 var(--space-4);
+    padding-top: var(--space-4);
+    border-top: var(--border-boundary);
+  }
+  .case-body :global(h2:first-child) {
+    margin-top: 0;
+  }
+  .case-body :global(h3) {
+    font-size: var(--text-lg);
+    margin: var(--space-8) 0 var(--space-3);
+  }
+  .case-body :global(p) {
+    margin: var(--space-4) 0;
+  }
+  .case-body :global(blockquote) {
+    margin: var(--space-6) 0;
+    padding: var(--space-3) var(--space-4);
+    border-left: 4px solid var(--color-line-strong);
+    background: var(--color-surface);
+    font-style: normal;
+  }
+  .case-body :global(blockquote p) {
+    margin: 0;
+  }
+  .case-body :global(ul),
+  .case-body :global(ol) {
+    padding-left: 1.4em;
+  }
+  .case-body :global(li) {
+    margin: var(--space-2) 0;
+  }
+  /* GFMタスクリスト(現地調査項目) */
+  .case-body :global(ul.contains-task-list) {
+    list-style: none;
+    padding-left: 0;
+    border: var(--border-hairline);
+    background: var(--color-surface);
+  }
+  .case-body :global(li.task-list-item) {
+    margin: 0;
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-sm);
+  }
+  .case-body :global(li.task-list-item + li.task-list-item) {
+    border-top: 1px dotted var(--color-line);
+  }
+  .case-body :global(li.task-list-item input[type="checkbox"]) {
+    margin-right: var(--space-2);
+  }
+  .case-body :global(table) {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: var(--text-sm);
+  }
+  .case-body :global(th),
+  .case-body :global(td) {
+    border: var(--border-hairline);
+    padding: var(--space-2) var(--space-3);
+    text-align: left;
+    vertical-align: top;
+  }
+  .case-body :global(th) {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    background: var(--color-bg);
+  }
+  .case-body :global(code) {
+    font-size: 0.9em;
+    background: var(--color-bg);
+    border: 1px solid var(--color-line);
+    padding: 0 0.3em;
+  }
+
+  /* ---- モバイル ---- */
+  @media (max-width: 60rem) {
+    .case-columns {
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+    }
+    .toc {
+      position: static;
+      border: var(--border-hairline);
+      background: var(--color-surface);
+    }
+    .toc-summary {
+      padding: var(--space-2) var(--space-4);
+    }
+    .toc-summary::before {
+      content: "▸ ";
+    }
+    .toc[open] .toc-summary::before {
+      content: "▾ ";
+    }
+    .toc-nav {
+      padding: 0 var(--space-4) var(--space-3);
+    }
+  }
+</style>
+
+<script>
+  // 目次の現在位置表示(スクロールスパイ)と、モバイルでの初期折りたたみ。
+  // これ以外のJSは持たない(specs.md §7: JavaScriptは最小限)。
+  const toc = document.querySelector<HTMLDetailsElement>(".toc");
+  if (toc) {
+    if (window.matchMedia("(max-width: 60rem)").matches) {
+      toc.removeAttribute("open");
+    }
+
+    const links = Array.from(toc.querySelectorAll<HTMLAnchorElement>('a[href^="#"]'));
+    const byId = new Map(
+      links.map((a) => [decodeURIComponent(a.getAttribute("href")!.slice(1)), a]),
+    );
+    const targets = Array.from(byId.keys())
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+
+    const setCurrent = (id: string) => {
+      for (const a of links) a.removeAttribute("aria-current");
+      byId.get(id)?.setAttribute("aria-current", "true");
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) setCurrent(entry.target.id);
+        }
+      },
+      { rootMargin: "0px 0px -75% 0px" },
+    );
+    for (const el of targets) observer.observe(el);
+  }
+</script>

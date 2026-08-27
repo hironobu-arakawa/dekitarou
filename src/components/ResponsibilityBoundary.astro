@@ -1,0 +1,235 @@
+---
+/**
+ * 責任分界図 — このサイトの signature element (specs.md §5)
+ *
+ * システムを層に分け、各層の責任者を色帯で示す。
+ * shared(協議)= 未決 = 最大のリスク。唯一の警告色で表現する。
+ * 静的CSS Gridのみ。JSアニメーションなし。モバイルでは縦積みに崩れる。
+ */
+type Owner = "contractor" | "customer" | "licensed" | "shared";
+
+interface Boundary {
+  layer: string;
+  owner: Owner;
+  note?: string;
+}
+
+interface Props {
+  boundaries: Boundary[];
+  caption?: string;
+}
+
+const { boundaries, caption } = Astro.props;
+
+const ownerLabels: Record<Owner, string> = {
+  contractor: "受注者",
+  customer: "顧客",
+  licensed: "有資格者",
+  shared: "協議(未決)",
+};
+---
+
+<figure class="rb">
+  {
+    /* 見出しの直下で使う場合はcaptionを渡さない(ラベル重複を避ける) */
+    caption && (
+      <figcaption class="rb-caption">
+        <span class="rb-caption-label">責任分界図</span>
+        <span class="rb-caption-sub">{caption}</span>
+      </figcaption>
+    )
+  }
+
+  <div class="rb-rows">
+    {
+      boundaries.map((b) => (
+        <div class={`rb-row rb-owner-${b.owner}`}>
+          <div class="rb-layer">{b.layer}</div>
+          <div class="rb-cell">
+            <span class="rb-owner">
+              {ownerLabels[b.owner]}
+              {b.owner === "contractor" && <span class="rb-star" aria-hidden="true">★</span>}
+              {b.owner === "shared" && <span class="rb-warn-mark" aria-hidden="true">!</span>}
+            </span>
+            {b.note && <span class="rb-note">{b.note}</span>}
+          </div>
+        </div>
+      ))
+    }
+  </div>
+
+  <p class="rb-legend">
+    <span class="rb-legend-item rb-owner-contractor"><i></i>受注者(★=自分の担当)</span>
+    <span class="rb-legend-item rb-owner-customer"><i></i>顧客</span>
+    <span class="rb-legend-item rb-owner-licensed"><i></i>有資格者</span>
+    <span class="rb-legend-item rb-owner-shared"><i></i>協議=未決。契約前に潰す</span>
+  </p>
+</figure>
+
+<style>
+  .rb {
+    margin: var(--space-8) 0;
+    font-family: var(--font-body);
+  }
+
+  .rb-caption {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+    margin-bottom: var(--space-2);
+  }
+  .rb-caption-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+  .rb-caption-sub {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+  }
+
+  /* 罫線は責任の境界を示す時だけ使う。外周と行間は強い線 */
+  .rb-rows {
+    border: var(--border-boundary);
+    background: var(--color-surface);
+  }
+  .rb-row {
+    display: grid;
+    grid-template-columns: minmax(9rem, 14rem) 1fr;
+  }
+  .rb-row + .rb-row {
+    border-top: var(--border-boundary);
+  }
+
+  .rb-layer {
+    padding: var(--space-3) var(--space-4);
+    font-weight: 600;
+    line-height: var(--leading-tight);
+    display: flex;
+    align-items: center;
+    border-right: var(--border-hairline);
+  }
+
+  .rb-cell {
+    padding: var(--space-3) var(--space-4);
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    line-height: var(--leading-tight);
+    border-left: 6px solid transparent;
+  }
+  .rb-owner {
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .rb-star {
+    margin-left: var(--space-1);
+  }
+  .rb-note {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+  }
+
+  /* 責任者4区分の色帯 */
+  .rb-owner-contractor .rb-cell {
+    background: var(--color-owner-contractor-bg);
+    border-left-color: var(--color-owner-contractor);
+  }
+  .rb-owner-contractor .rb-owner {
+    color: var(--color-owner-contractor);
+  }
+  .rb-owner-customer .rb-cell {
+    background: var(--color-owner-customer-bg);
+    border-left-color: var(--color-owner-customer);
+  }
+  .rb-owner-customer .rb-owner {
+    color: var(--color-owner-customer);
+  }
+  .rb-owner-licensed .rb-cell {
+    background: var(--color-owner-licensed-bg);
+    border-left-color: var(--color-owner-licensed);
+  }
+  .rb-owner-licensed .rb-owner {
+    color: var(--color-owner-licensed);
+  }
+
+  /* shared = 未決。斜線パターン+警告色で、他と質の違う状態であることを示す */
+  .rb-owner-shared .rb-cell {
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--color-owner-shared-bg),
+      var(--color-owner-shared-bg) 8px,
+      #ffffff 8px,
+      #ffffff 12px
+    );
+    border-left-color: var(--color-owner-shared);
+  }
+  .rb-owner-shared .rb-owner {
+    color: var(--color-owner-shared);
+  }
+  .rb-warn-mark {
+    display: inline-block;
+    margin-left: var(--space-1);
+    font-family: var(--font-mono);
+    font-weight: 700;
+    border: 1.5px solid var(--color-owner-shared);
+    width: 1.1em;
+    text-align: center;
+    line-height: 1.1;
+  }
+
+  /* 凡例 */
+  .rb-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-6);
+    margin: var(--space-2) 0 0;
+    font-size: var(--text-xs);
+    color: var(--color-ink-muted);
+  }
+  .rb-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .rb-legend-item i {
+    width: 0.9em;
+    height: 0.9em;
+    border: 1px solid var(--color-line);
+  }
+  .rb-legend-item.rb-owner-contractor i {
+    background: var(--color-owner-contractor-bg);
+    border-color: var(--color-owner-contractor);
+  }
+  .rb-legend-item.rb-owner-customer i {
+    background: var(--color-owner-customer-bg);
+    border-color: var(--color-owner-customer);
+  }
+  .rb-legend-item.rb-owner-licensed i {
+    background: var(--color-owner-licensed-bg);
+    border-color: var(--color-owner-licensed);
+  }
+  .rb-legend-item.rb-owner-shared i {
+    background: var(--color-owner-shared-bg);
+    border-color: var(--color-owner-shared);
+  }
+
+  /* モバイル: 縦積み */
+  @media (max-width: 40rem) {
+    .rb-row {
+      grid-template-columns: 1fr;
+    }
+    .rb-layer {
+      border-right: none;
+      padding-bottom: 0;
+    }
+    .rb-cell {
+      margin: var(--space-2) var(--space-4) var(--space-3);
+      padding: var(--space-2) var(--space-3);
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+  }
+</style>

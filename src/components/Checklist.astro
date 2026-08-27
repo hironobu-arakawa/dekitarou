@@ -1,0 +1,59 @@
+---
+/**
+ * チェックリスト表示 (specs.md §7)。
+ * 現地で見ながら使う前提。等幅・チェックボックス風の静的表示。
+ * ※ Markdown本文中は GFM タスクリスト(- [ ])を使う。
+ *   このコンポーネントはページ/レイアウト側で使う。
+ */
+interface Props {
+  items: string[];
+  title?: string;
+}
+
+const { items, title } = Astro.props;
+---
+
+<div class="checklist">
+  {title && <p class="checklist-title">{title}</p>}
+  <ul>
+    {items.map((item) => <li>{item}</li>)}
+  </ul>
+</div>
+
+<style>
+  .checklist {
+    border: var(--border-hairline);
+    background: var(--color-surface);
+    padding: var(--space-3) var(--space-4);
+    margin: var(--space-6) 0;
+  }
+  .checklist-title {
+    margin: 0 0 var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+  .checklist ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .checklist li {
+    position: relative;
+    padding: var(--space-1) 0 var(--space-1) 1.8em;
+    font-size: var(--text-sm);
+  }
+  .checklist li + li {
+    border-top: 1px dotted var(--color-line);
+  }
+  .checklist li::before {
+    content: "";
+    position: absolute;
+    left: 0.2em;
+    top: 0.65em;
+    width: 0.9em;
+    height: 0.9em;
+    border: 1.5px solid var(--color-ink-muted);
+    background: var(--color-surface);
+  }
+</style>
