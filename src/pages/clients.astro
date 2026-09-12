@@ -1,0 +1,77 @@
+---
+import Base from "../layouts/Base.astro";
+
+// 発注側(導入先・工場側)の切替先。当面は簡素な1枚に留める
+// (specs.md 改訂記録 2026-09-12 D。作り込みは別フェーズ)。
+---
+
+<Base
+  title="発注する側の方へ"
+  description="デキタロウは受注者向けの作法集。発注する側が読むと、良い発注の条件が裏返しで見えてくる。"
+>
+  <article class="clients">
+    <p class="kicker mono">発注する側の方へ / FOR CLIENTS</p>
+    <h1>このサイトは、受注する側の作法集です</h1>
+    <p>
+      デキタロウは、工場の小さなDX案件を<strong>受注するエンジニアに向けて</strong>、
+      責任分界の引き方や撤退基準を書いたサイトです。発注する側(導入先・工場側)の方が読んでも、そのまま役に立ちます。
+      <strong>受注者の作法は、裏返すと良い発注の条件</strong>だからです。
+    </p>
+
+    <h2>発注前に眺めると役に立つもの</h2>
+    <ul>
+      <li>
+        <a href="/tools/rates/">相場・工数の早見表</a> —
+        依頼したい案件の費用感と、資格・設備接触の有無が1枚で分かる
+      </li>
+      <li>
+        各案件カードの<strong>「責任分界図」</strong>と<strong>「受けない方がいい条件」</strong> —
+        誠実な受注者ほど、ここを一緒に埋めたがる。逆に、責任の話を曖昧にしたまま金額だけ出す相手には注意
+      </li>
+      <li>
+        <a href="/tools/boundary-sheet/">責任分界図の型(空欄版)</a> —
+        発注側から印刷して持ちかけてもよい。「止まった時に誰が直すか」を先に決める道具
+      </li>
+    </ul>
+
+    <h2>お願い</h2>
+    <p>
+      本サイトの内容は一般的な情報提供であり、個別案件の可否判断はできません。
+      発注側からの個別のご相談窓口は現在設けていませんが、内容についての連絡は
+      <a href="/contact/">問い合わせ</a>から受け付けています。
+    </p>
+
+    <p class="back"><a href="/">受注する側のページへ →</a></p>
+  </article>
+</Base>
+
+<style>
+  .clients {
+    max-width: var(--content-width);
+  }
+  .kicker {
+    font-size: var(--text-xs);
+    color: var(--color-ink-muted);
+    letter-spacing: 0.06em;
+    margin: 0 0 var(--space-2);
+  }
+  .mono {
+    font-family: var(--font-mono);
+  }
+  .clients h2 {
+    font-size: var(--text-xl);
+    margin: var(--space-12) 0 var(--space-4);
+    padding-top: var(--space-4);
+    border-top: var(--border-boundary);
+  }
+  .clients ul {
+    padding-left: 1.4em;
+  }
+  .clients li {
+    margin: var(--space-3) 0;
+  }
+  .back {
+    margin-top: var(--space-12);
+    font-size: var(--text-sm);
+  }
+</style>

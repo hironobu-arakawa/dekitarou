@@ -7,6 +7,9 @@ interface Props {
 }
 
 const { title, description = "現場で小さなDX案件を受注するエンジニアが、現場に入る前に読むサイト。" } = Astro.props;
+
+// 受注する⇄発注する の読者切替(specs.md 改訂記録 2026-09-12 D)
+const isClientSide = Astro.url.pathname.startsWith("/clients");
 ---
 
 <!doctype html>
@@ -22,11 +25,17 @@ const { title, description = "現場で小さなDX案件を受注するエンジ
       <nav aria-label="サイト内">
         <a href="/" class="site-name">デキタロウ</a>
         <ul class="site-nav">
+          <li><a href="/#toolbox">道具箱</a></li>
           <li><a href="/cases/">案件カード</a></li>
           <li><a href="/guides/">横断ドキュメント</a></li>
           <li><a href="/about/">このサイトについて</a></li>
           <li><a href="/contact/">問い合わせ</a></li>
         </ul>
+        <div class="audience" aria-label="読者の切替">
+          <a href="/" aria-current={!isClientSide ? "true" : undefined}>受注する</a><a
+            href="/clients/"
+            aria-current={isClientSide ? "true" : undefined}>発注する</a>
+        </div>
       </nav>
     </header>
 
@@ -80,6 +89,26 @@ const { title, description = "現場で小さなDX案件を受注するエンジ
   .site-nav a:hover {
     color: var(--color-ink);
     text-decoration: underline;
+  }
+  .audience {
+    margin-left: auto;
+    display: inline-flex;
+    border: var(--border-hairline);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+  }
+  .audience a {
+    padding: var(--space-1) var(--space-3);
+    color: var(--color-ink-muted);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .audience a + a {
+    border-left: var(--border-hairline);
+  }
+  .audience a[aria-current="true"] {
+    background: var(--color-ink);
+    color: var(--color-bg);
   }
   main {
     max-width: var(--page-width);

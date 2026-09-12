@@ -1,91 +1,116 @@
 ---
 import Base from "../layouts/Base.astro";
-import ResponsibilityBoundary from "../components/ResponsibilityBoundary.astro";
-import CaseCard from "../components/CaseCard.astro";
+import SectionLabel from "../components/SectionLabel.astro";
 import { getCollection } from "astro:content";
 import { bySpecOrder } from "../lib/case-order";
 
 const cases = (await getCollection("cases")).sort(bySpecOrder);
-const guides = (await getCollection("guides")).sort((a, b) => a.data.order - b.data.order);
 
-// トップに置く責任分界図の一般形。「動いた」と「使える」の間に何があるかを1画面で見せる。
-const heroBoundaries = [
+// 道具箱(specs.md 改訂記録 2026-09-12 C)。名前はOT語、器はIT語。
+const tools = [
   {
-    layer: "設備本体",
-    owner: "customer",
-    note: "触らない。触った瞬間に責任の質が変わる。",
+    href: "/tools/rates/",
+    jp: "相場・工数の早見表",
+    en: "RATES",
+    desc: "10案件の予算帯・工数・難易度を1枚で。金額を聞かれる前に開く。",
   },
   {
-    layer: "信号・データの取り出し",
-    owner: "licensed",
-    note: "盤の中は有資格者の世界。誰が手配するかを先に決める。",
+    href: "/guides/pre-visit-checklist/",
+    jp: "現場に入る前チェックリスト",
+    en: "CHECKLIST",
+    desc: "初回訪問で確認すること。現地でスマホで開く前提で書いてある。",
   },
   {
-    layer: "収集・可視化",
-    owner: "contractor",
-    note: "ここだけが受注者の領域。ここは狭いほど強い。",
+    href: "/tools/boundary-sheet/",
+    jp: "責任分界図の型(空欄版)",
+    en: "BOUNDARY SHEET",
+    desc: "顧客と一緒に埋めるシート。印刷して現場に持っていく。",
   },
   {
-    layer: "止まった時の一次対応",
-    owner: "shared",
-    note: "決めずに始まった案件は、必ずここで揉める。",
+    href: "/guides/license-law-map/",
+    jp: "資格・法令の早見表",
+    en: "LAW MAP",
+    desc: "どこからが自分の領域でないか。気づいて手を止めるための表。",
   },
-  {
-    layer: "判断・処置",
-    owner: "customer",
-    note: "数字を見て動くのは現場。ここは渡さない。",
-  },
-] as const;
+];
 ---
 
-<Base title="動いた、では終わらない">
+<Base title="現場DX案件を、仕事として閉じるための道具箱">
   <section class="hero">
-    <h1 class="hero-copy">
-      動いた、では終わらない。<br />
-      止まった時に誰が直すのかまで決めて、はじめて「できた」。
-    </h1>
+    <h1 class="hero-title">現場DX案件を、仕事として閉じるための道具箱</h1>
     <p class="hero-sub">
-      現場(OT)の小さなDX案件を受注するエンジニアが、現場に入る前に読むサイト。
-      技術解説ではなく、案件を仕事として閉じるための作法を扱う。
+      動いた、では終わらない。止まった時に誰が直すのかまで決めて、はじめて「できた」。<br />
+      工場(OT)の小さな案件を受注するエンジニアのために、現場側の人間が書いている。
     </p>
-    <ResponsibilityBoundary boundaries={[...heroBoundaries]} caption="小さな現場DX案件の一般形" />
   </section>
 
   <section class="section">
-    <h2 class="section-title">案件カード</h2>
-    <p class="section-lead">
-      案件単位の実務ドキュメント。すべて同じ12セクション・同じ順序で書かれている。上から順に、設備との距離が近くなる。
-    </p>
-    <div class="case-list">
+    <SectionLabel jp="道具箱" en="TOOLBOX" id="toolbox" />
+    <p class="section-lead">現場に入る前・見積を出す前に開くもの。出先のスマホでそのまま使える。</p>
+    <div class="tool-grid">
       {
-        cases.map((c) => (
-          <CaseCard
-            slug={c.data.slug}
-            title={c.data.title}
-            summary={c.data.summary}
-            difficulty={c.data.difficulty}
-            budgetRange={c.data.budgetRange}
-            duration={c.data.duration}
-            requiresLicense={c.data.requiresLicense}
-            touchesEquipment={c.data.touchesEquipment}
-          />
+        tools.map((t) => (
+          <a href={t.href} class="tool">
+            <span class="tool-name">
+              {t.jp} <span class="tool-en mono">{t.en}</span>
+            </span>
+            <span class="tool-desc">{t.desc}</span>
+          </a>
         ))
       }
     </div>
   </section>
 
   <section class="section">
-    <h2 class="section-title">横断ドキュメント</h2>
-    <p class="section-lead">案件をまたいで共通する作法。現場に入る前・契約する前に読む。</p>
+    <SectionLabel jp="案件から探す" en="CASES" />
+    <p class="section-lead">
+      すべてのカードは、現場の生の言葉をITの要件に翻訳するところから始まり、責任分界図・受けない方がいい条件・保守まで同じ12セクションで書かれている。上ほど安全な入口。
+    </p>
+    <div class="table-scroll">
+      <table class="case-table">
+        <thead>
+          <tr>
+            <th>案件</th>
+            <th>難易度</th>
+            <th>予算帯</th>
+            <th>期間</th>
+            <th>設備接触</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            cases.map((c) => (
+              <tr>
+                <td class="cell-title">
+                  <a href={`/cases/${c.data.slug}/`}>{c.data.title}</a>
+                </td>
+                <td class="mono" aria-label={`5段階中${c.data.difficulty}`}>
+                  {"■".repeat(c.data.difficulty) + "□".repeat(5 - c.data.difficulty)}
+                </td>
+                <td class="mono nowrap">{c.data.budgetRange}</td>
+                <td class="mono nowrap">{c.data.duration}</td>
+                <td class={c.data.touchesEquipment ? "flag" : undefined}>
+                  {c.data.touchesEquipment ? "あり" : "なし"}
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="section-foot"><a href="/cases/">案件カード一覧(概要つき)へ →</a></p>
+  </section>
+
+  <section class="section">
+    <SectionLabel jp="読みもの" en="GUIDES" />
     <ul class="guide-links">
-      {
-        guides.map((g) => (
-          <li>
-            <a href={`/guides/${g.data.slug}/`}>{g.data.title}</a>
-            <span class="guide-summary">{g.data.summary}</span>
-          </li>
-        ))
-      }
+      <li>
+        <a href="/guides/responsibility-boundary/">責任分界の決め方</a>
+        <span class="guide-summary">契約前に決めておかないと、後から必ず揉める6項目。</span>
+      </li>
+      <li>
+        <a href="/guides/">横断ドキュメント一覧へ →</a>
+      </li>
     </ul>
   </section>
 </Base>
@@ -93,36 +118,120 @@ const heroBoundaries = [
 <style>
   .hero {
     max-width: var(--content-width);
+    margin-bottom: var(--space-12);
   }
-  .hero-copy {
+  .hero-title {
     font-size: var(--text-2xl);
-    line-height: 1.6;
-    margin: var(--space-8) 0 var(--space-4);
+    line-height: 1.5;
+    margin: var(--space-4) 0 var(--space-3);
   }
   .hero-sub {
     color: var(--color-ink-muted);
-    margin: 0 0 var(--space-4);
+    font-size: var(--text-sm);
+    margin: 0;
   }
 
   .section {
-    margin-top: var(--space-16);
+    margin-top: var(--space-12);
     max-width: var(--content-width);
-  }
-  .section-title {
-    font-size: var(--text-xl);
-    border-top: var(--border-boundary);
-    padding-top: var(--space-4);
-    margin: 0 0 var(--space-2);
   }
   .section-lead {
     color: var(--color-ink-muted);
     font-size: var(--text-sm);
     margin: 0 0 var(--space-6);
   }
-  .case-list {
+  .section-foot {
+    font-size: var(--text-sm);
+    margin: var(--space-4) 0 0;
+  }
+  .mono {
+    font-family: var(--font-mono);
+  }
+
+  /* ---- 道具箱 ---- */
+  .tool-grid {
     display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: var(--space-4);
   }
+  .tool {
+    display: grid;
+    gap: var(--space-2);
+    border: var(--border-hairline);
+    border-left: 3px solid var(--color-owner-contractor);
+    background: var(--color-surface);
+    padding: var(--space-4) var(--space-6);
+    text-decoration: none;
+    color: var(--color-ink);
+  }
+  .tool:hover .tool-name {
+    color: var(--color-owner-contractor);
+    text-decoration: underline;
+  }
+  .tool-name {
+    font-weight: 700;
+    font-size: var(--text-lg);
+    line-height: var(--leading-tight);
+  }
+  .tool-en {
+    font-size: var(--text-xs);
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    color: var(--color-ink-muted);
+    margin-left: var(--space-1);
+  }
+  .tool-desc {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+  }
+  @media (max-width: 40rem) {
+    .tool-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* ---- 案件一覧表 ---- */
+  .table-scroll {
+    overflow-x: auto;
+  }
+  .case-table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 38rem;
+    font-size: var(--text-sm);
+    background: var(--color-surface);
+  }
+  .case-table th,
+  .case-table td {
+    border: var(--border-hairline);
+    padding: var(--space-2) var(--space-3);
+    text-align: left;
+    vertical-align: top;
+  }
+  .case-table th {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    background: var(--color-bg);
+    white-space: nowrap;
+  }
+  .cell-title a {
+    font-weight: 700;
+    color: var(--color-ink);
+    text-decoration: none;
+  }
+  .cell-title a:hover {
+    color: var(--color-owner-contractor);
+    text-decoration: underline;
+  }
+  .nowrap {
+    white-space: nowrap;
+  }
+  .flag {
+    color: var(--color-warning);
+    font-weight: 700;
+  }
+
+  /* ---- 読みもの ---- */
   .guide-links {
     list-style: none;
     margin: 0;

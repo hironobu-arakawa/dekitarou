@@ -1,0 +1,279 @@
+---
+import Base from "../../layouts/Base.astro";
+
+// 責任分界図の空欄版。顧客と一緒に埋めるための、印刷して現場に持っていくシート。
+// 層は一般形を印字し、現場に合わせて書き換える前提。
+const layers = [
+  { name: "設備本体", hint: "" },
+  { name: "信号・データの取り出し", hint: "" },
+  { name: "収集・可視化", hint: "" },
+  { name: "止まった時の一次対応", hint: "" },
+  { name: "判断・処置", hint: "" },
+  { name: "", hint: "" },
+  { name: "", hint: "" },
+];
+
+const owners = ["受注者", "顧客", "有資格者", "協議"];
+
+const sixItems = [
+  "どこまで触れるか(やらないことを明文化したか)",
+  "止まったとき、最初に誰が動くか(一次対応)",
+  "復旧の最終責任は誰か(切り分け手順を決めたか)",
+  "データは誰のものか(契約名義・終了時の引き渡し)",
+  "効果はいつ・どう確認するか(納品完了と効果確認を分けたか)",
+  "やめ方(撤退基準・解約時の引き継ぎ)",
+];
+---
+
+<Base
+  title="責任分界図の型(空欄版)"
+  description="顧客と一緒に埋める責任分界シート。印刷して現場に持っていき、協議の欄が残ったまま契約しないための道具。"
+>
+  <article class="sheet-page">
+    <header class="sheet-intro no-print">
+      <p class="kicker mono">道具箱 / TOOLBOX</p>
+      <h1 class="sheet-title">責任分界図の型(空欄版) <span class="en mono">BOUNDARY SHEET</span></h1>
+      <ol class="howto">
+        <li>層の名前を現場に合わせて書き換える(消して書いてよい。型は出発点にすぎない)</li>
+        <li>顧客と一緒に、各層の責任者ひとつに○を付ける</li>
+        <li><strong>「協議」に○が残ったまま契約しない。</strong>協議=未決=最大のリスク</li>
+      </ol>
+      <p class="howto-note">
+        ブラウザの印刷機能でA4縦に印刷できる。埋め方の考え方は
+        <a href="/guides/responsibility-boundary/">責任分界の決め方</a>、記入例は各<a href="/cases/">案件カード</a>の責任分界図を参照。
+      </p>
+    </header>
+
+    <section class="sheet" aria-label="責任分界シート">
+      <div class="titleblock">
+        <div class="tb-cell"><span class="tb-label mono">案件名</span></div>
+        <div class="tb-cell"><span class="tb-label mono">顧客</span></div>
+        <div class="tb-cell"><span class="tb-label mono">日付</span></div>
+        <div class="tb-cell"><span class="tb-label mono">作成</span></div>
+      </div>
+
+      <table class="sheet-table">
+        <thead>
+          <tr>
+            <th class="col-layer">層</th>
+            {owners.map((o) => <th class:list={["col-owner", { warn: o === "協議" }]}>{o}</th>)}
+            <th class="col-note">補足(合意した条件)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            layers.map((l) => (
+              <tr>
+                <td class="cell-layer">{l.name}</td>
+                {owners.map(() => (
+                  <td class="cell-owner">
+                    <span class="mark" aria-hidden="true" />
+                  </td>
+                ))}
+                <td class="cell-note" />
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+
+      <p class="sheet-warn">
+        ⚠ 「協議」の○は未決の印。この欄がひとつでも残っている間は、見積の確定も契約もしない。
+      </p>
+
+      <h2 class="sheet-h2">契約前に決める6項目 <span class="en mono">CHECK</span></h2>
+      <ul class="sixcheck">
+        {
+          sixItems.map((item) => (
+            <li>
+              <span class="mark" aria-hidden="true" />
+              {item}
+            </li>
+          ))
+        }
+      </ul>
+
+      <p class="sheet-footer mono">
+        デキタロウ — 現場DX案件を、仕事として閉じるための道具箱
+      </p>
+    </section>
+  </article>
+</Base>
+
+<style>
+  .sheet-page {
+    max-width: var(--content-width);
+  }
+  .kicker {
+    font-size: var(--text-xs);
+    color: var(--color-ink-muted);
+    letter-spacing: 0.06em;
+    margin: 0 0 var(--space-2);
+  }
+  .sheet-title {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    margin: 0 0 var(--space-4);
+    font-size: var(--text-2xl);
+  }
+  .en {
+    font-size: var(--text-xs);
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    color: var(--color-ink-muted);
+  }
+  .mono {
+    font-family: var(--font-mono);
+  }
+  .howto {
+    padding-left: 1.4em;
+    margin: 0 0 var(--space-3);
+  }
+  .howto li {
+    margin: var(--space-1) 0;
+  }
+  .howto-note {
+    font-size: var(--text-sm);
+    color: var(--color-ink-muted);
+    margin: 0 0 var(--space-6);
+  }
+
+  /* ---- シート本体(画面でも印刷でも同じ見た目)---- */
+  .sheet {
+    border: var(--border-boundary);
+    background: var(--color-surface);
+    padding: var(--space-6);
+  }
+  .titleblock {
+    display: grid;
+    grid-template-columns: 2fr 2fr 1fr 1fr;
+    border: var(--border-hairline);
+    margin-bottom: var(--space-6);
+  }
+  .tb-cell {
+    min-height: 3.2rem;
+    padding: var(--space-1) var(--space-2);
+  }
+  .tb-cell + .tb-cell {
+    border-left: var(--border-hairline);
+  }
+  .tb-label {
+    font-size: var(--text-xs);
+    color: var(--color-ink-muted);
+  }
+
+  .sheet-table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: var(--text-sm);
+  }
+  .sheet-table th,
+  .sheet-table td {
+    border: var(--border-hairline);
+    padding: var(--space-2);
+    text-align: left;
+  }
+  .sheet-table th {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    background: var(--color-bg);
+    text-align: center;
+  }
+  th.col-layer {
+    text-align: left;
+    width: 30%;
+  }
+  th.col-owner {
+    width: 9%;
+  }
+  th.warn {
+    color: var(--color-owner-shared);
+  }
+  .cell-layer {
+    height: 3rem;
+    font-weight: 600;
+    border-bottom-style: solid;
+  }
+  .cell-owner {
+    text-align: center;
+    vertical-align: middle;
+  }
+  .mark {
+    display: inline-block;
+    width: 1.1em;
+    height: 1.1em;
+    border: 1.5px solid var(--color-ink-muted);
+    border-radius: 50%;
+    vertical-align: middle;
+  }
+  .sixcheck .mark {
+    border-radius: 0;
+    margin-right: var(--space-2);
+  }
+
+  .sheet-warn {
+    font-size: var(--text-sm);
+    color: var(--color-owner-shared);
+    margin: var(--space-3) 0 var(--space-8);
+  }
+  .sheet-h2 {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+    font-size: var(--text-lg);
+    border-top: var(--border-boundary);
+    padding-top: var(--space-4);
+    margin: 0 0 var(--space-3);
+  }
+  .sixcheck {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .sixcheck li {
+    padding: var(--space-2) 0;
+    font-size: var(--text-sm);
+  }
+  .sixcheck li + li {
+    border-top: 1px dotted var(--color-line);
+  }
+  .sheet-footer {
+    margin: var(--space-8) 0 0;
+    font-size: var(--text-xs);
+    color: var(--color-ink-muted);
+    text-align: right;
+  }
+
+  @media (max-width: 40rem) {
+    .sheet {
+      padding: var(--space-3);
+    }
+    .titleblock {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>
+
+<style is:global>
+  /* 印刷時はシートだけを出す */
+  @media print {
+    .site-header,
+    .site-footer,
+    .no-print {
+      display: none !important;
+    }
+    main {
+      padding: 0 !important;
+    }
+    .sheet {
+      border-width: 1.5pt;
+      padding: 0;
+      border: none;
+    }
+    body {
+      background: #fff;
+    }
+  }
+</style>
