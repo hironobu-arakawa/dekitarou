@@ -1,0 +1,262 @@
+---
+import Base from "../../layouts/Base.astro";
+import SectionLabel from "../../components/SectionLabel.astro";
+
+// 現場語⇄IT語の対訳早見表。対訳表は双方向であり、橋の両側から使う
+// (specs.md 改訂記録 2026-09-12 B-3)。
+
+// 現場語 → IT人向け(意味と、案件でどう効くか)
+const otTerms = [
+  {
+    term: "チョコ停",
+    meaning: "数秒〜数分の短い停止。現場では故障と呼ばれないことが多い",
+    why: "「稼働」の定義を左右する。稼働率の数字が現場の体感とずれる主因",
+  },
+  {
+    term: "段取り替え",
+    meaning: "製品の切替に伴う準備作業。設備は止まるが異常ではない",
+    why: "停止時間の内訳を聞くときの必須語。これを停止扱いにすると現場は納得しない",
+  },
+  {
+    term: "盤(制御盤・分電盤)",
+    meaning: "電気機器・制御機器が収まった箱。開けるのは有資格者・保全の領域",
+    why: "責任分界の物理的な境界線。「盤を開けますか」が案件の重さを決める",
+  },
+  {
+    term: "活線",
+    meaning: "電気が通ったままの状態。活線での作業は資格と社内規程の世界",
+    why: "「止められますか」を必ず聞く理由。止められない現場は段取りが変わる",
+  },
+  {
+    term: "ラダー",
+    meaning: "PLCのプログラム。リレー回路図の文化を引き継いだ図の言語",
+    why: "読めなくてもよいが、「ラダーには触りません」という宣言はできる必要がある",
+  },
+  {
+    term: "検収",
+    meaning: "発注側が納品物を確認して受け入れること。支払いの引き金",
+    why: "「検収条件を先に決めましょう」が言えると、案件の終わりが定義できる",
+  },
+  {
+    term: "立会い",
+    meaning: "作業に現場の人が付き添うこと",
+    why: "こちらの現地作業には基本これが付く。相手の時間をもらう自覚が要る",
+  },
+  {
+    term: "KY(危険予知)・ヒヤリハット",
+    meaning: "作業前の危険確認と、事故未遂の報告文化",
+    why: "現場に入る日はこの文化に従う側になる。安全の管理点の入口",
+  },
+  {
+    term: "5S",
+    meaning: "整理・整頓・清掃・清潔・躾。現場の秩序の共通言語",
+    why: "機器の設置・配線も5Sの対象。「ここに置いていい」は5Sの文脈で決まる",
+  },
+  {
+    term: "デマンド",
+    meaning: "電気契約上の需要電力(30分平均)。基本料金を決める",
+    why: "エネルギー案件で「電気代を下げたい」の中身を特定する鍵",
+  },
+  {
+    term: "原単位",
+    meaning: "製品1個(1単位)あたりのエネルギー・資源の使用量",
+    why: "環境・原価の両方に通じる言葉。使えると話が一段深くなる",
+  },
+];
+
+// IT語 → 現場での言い換え(そのまま言うとどう聞こえるか)
+const itTerms = [
+  {
+    term: "クラウド",
+    heard: "うちのデータが、どこか知らない場所に行く",
+    say: "よそから借りたサーバーに置きます。社外に出してよいかは確認させてください",
+  },
+  {
+    term: "API(連携)",
+    heard: "(意味のない音)",
+    say: "機械同士で数字を受け渡しします。人手の転記がなくなります",
+  },
+  {
+    term: "サブスク / SaaS",
+    heard: "一生払わされる",
+    say: "月々の道具代です。やめれば止まります。契約はお客様の名義にします",
+  },
+  {
+    term: "リードオンリー",
+    heard: "何かされそう",
+    say: "読むだけで、書き込みは一切しません。設備の動きは変わりません",
+  },
+  {
+    term: "PoC",
+    heard: "実験台にされる",
+    say: "本採用の前のお試しです。「ここまでできたら判断」を先に決めましょう",
+  },
+  {
+    term: "アジャイル",
+    heard: "行き当たりばったり",
+    say: "まず小さく動かして、現物を見ながら一緒に決めます",
+  },
+  {
+    term: "ダッシュボード",
+    heard: "車の?",
+    say: "数字がまとまって見える画面です。事務所のPCでもスマホでも見られます",
+  },
+  {
+    term: "セキュリティポリシー",
+    heard: "難しい話が始まった",
+    say: "会社の決まりごとの確認です。ネットワークにつないでよいか、決められる方を教えてください",
+  },
+];
+---
+
+<Base
+  title="現場のことば対訳"
+  description="チョコ停・活線・検収などの現場語をIT人に、クラウド・APIなどのIT語を現場の言葉に。商談で落ちないための双方向の対訳早見表。"
+>
+  <article class="glossary">
+    <header class="glossary-header">
+      <p class="kicker mono">道具箱 / TOOLBOX</p>
+      <h1 class="glossary-title">現場のことば対訳 <span class="en mono">GLOSSARY</span></h1>
+      <p class="lead">
+        対訳表は双方向。上の表はIT側から現場に入る人のために、下の表は自分の言葉を現場語に直すために使う。
+        言葉の意味は現場ごとに揺れるので、最後は必ずその現場での使われ方を確認すること。
+      </p>
+    </header>
+
+    <section class="glossary-section">
+      <SectionLabel jp="現場語を知る" en="OT → IT" />
+      <p class="section-lead">商談・現地で飛んでくる言葉。意味と、案件でどう効くか。</p>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>現場語</th>
+              <th>意味</th>
+              <th>案件でどう効くか</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              otTerms.map((t) => (
+                <tr>
+                  <td class="cell-term">{t.term}</td>
+                  <td>{t.meaning}</td>
+                  <td class="cell-why">{t.why}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="glossary-section">
+      <SectionLabel jp="IT語を言い換える" en="IT → OT" />
+      <p class="section-lead">
+        そのまま口にすると「うちを知らない人」に分類される言葉。使いどころは<a
+          href="/guides/dandori/">案件の段取り</a>の第1段を参照。
+      </p>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>IT語</th>
+              <th>相手にはこう聞こえる</th>
+              <th>言い換え</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              itTerms.map((t) => (
+                <tr>
+                  <td class="cell-term">{t.term}</td>
+                  <td class="cell-heard">{t.heard}</td>
+                  <td>{t.say}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </article>
+</Base>
+
+<style>
+  .glossary-header {
+    border-bottom: var(--border-boundary);
+    padding-bottom: var(--space-6);
+    margin-bottom: var(--space-8);
+    max-width: var(--content-width);
+  }
+  .kicker {
+    font-size: var(--text-xs);
+    color: var(--color-ink-muted);
+    letter-spacing: 0.06em;
+    margin: 0 0 var(--space-2);
+  }
+  .glossary-title {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-2xl);
+  }
+  .en {
+    font-size: var(--text-xs);
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    color: var(--color-ink-muted);
+  }
+  .lead {
+    margin: 0;
+    color: var(--color-ink-muted);
+  }
+  .mono {
+    font-family: var(--font-mono);
+  }
+
+  .glossary-section {
+    margin-top: var(--space-12);
+    max-width: 56rem;
+  }
+  .section-lead {
+    color: var(--color-ink-muted);
+    font-size: var(--text-sm);
+    margin: 0 0 var(--space-4);
+  }
+  .table-scroll {
+    overflow-x: auto;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 40rem;
+    font-size: var(--text-sm);
+    background: var(--color-surface);
+  }
+  th,
+  td {
+    border: var(--border-hairline);
+    padding: var(--space-2) var(--space-3);
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    background: var(--color-bg);
+    white-space: nowrap;
+  }
+  .cell-term {
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .cell-why {
+    color: var(--color-ink-muted);
+  }
+  .cell-heard {
+    color: var(--color-owner-shared);
+  }
+</style>

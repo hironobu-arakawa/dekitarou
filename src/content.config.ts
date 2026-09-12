@@ -49,7 +49,7 @@ const cases = defineCollection({
 });
 
 /**
- * 横断ドキュメント(specs.md §4.1 (B))。3本のみ。
+ * 横断ドキュメント(specs.md §4.1 (B)+改訂記録)。
  */
 const guides = defineCollection({
   loader: glob({ pattern: "**/*.md", base: "./src/content/guides" }),
